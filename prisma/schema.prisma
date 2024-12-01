@@ -66,12 +66,12 @@ model Reservation {
 }
 
 model Config {
-  id        Int      @id @default(autoincrement())
-  daysOff   String[]
-  openedAt  DateTime @map("opened_at")
-  closedAt  DateTime @map("closed_at")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        Int        @id @default(autoincrement())
+  daysOff   DateTime[]
+  openedAt  String     @map("opened_at")
+  closedAt  String     @map("closed_at")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
 
   @@map("configs")
 }
