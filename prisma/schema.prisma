@@ -38,7 +38,7 @@ model Customer {
 
 model Table {
   id           Int           @id @default(autoincrement())
-  name         String        @db.VarChar()
+  name         String        @unique @db.VarChar()
   qty          Int
   isActive     Boolean
   createdAt    DateTime      @default(now()) @map("created_at")
