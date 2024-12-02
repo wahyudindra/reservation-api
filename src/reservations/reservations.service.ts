@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, Reservation } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma.service';
 import { BaseRepository } from 'src/utils/base-repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
@@ -8,6 +8,7 @@ import { QueryReservationDto } from './dto/query-reservation.dto';
 import { ErrorMessage } from 'src/common/constants/error-message';
 import * as dayjs from 'dayjs';
 import { ReservationStatus } from 'src/common/constants/enum-of-reservation';
+import { CancelledReservationDto } from './dto/cancelled-reservation.dto';
 
 @Injectable()
 export class ReservationsService extends BaseRepository {
@@ -48,6 +49,18 @@ export class ReservationsService extends BaseRepository {
 
         // TODO: send mail after reservation created
         return super.create(reservationData);
+    }
+
+    async setStatus(id: number, status: ReservationStatus, { cancelledNotes }: CancelledReservationDto) {
+        const reservation: Reservation = await this.findReservation(id, {});
+        if (reservation.status !== ReservationStatus.CONFIRMED || status === ReservationStatus.CONFIRMED) {
+            throw new BadRequestException(ErrorMessage.ACTION_STEP_DENIED);
+        }
+
+        return this.prisma.reservation.update({
+            where: { id },
+            data: { status, ...(status === ReservationStatus.CANCELLED && { cancelledNotes }) },
+        });
     }
 
     async validateStartedAt(startedAt: Date) {
